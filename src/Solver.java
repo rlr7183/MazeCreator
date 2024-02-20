@@ -17,29 +17,29 @@ public class Solver {
     }
 
     public List<Solution> dfs() {
-        State start = maze.getStart();
-        stack.push(start);
-        visited.add(start);
+        dfsRecursive(maze.getStart());
+        return solutions;
+    }
 
-        while (!stack.isEmpty()) {
-            State current = stack.pop();
-            if (current.equals(maze.getGoal())) {
-                Solution possibleSol = makePath(current);
-                //addSolution(possibleSol);
-                solutions.add(possibleSol);
-                return solutions;
+    private void dfsRecursive(State current) {
+        if (current.equals(maze.getGoal())) {
+            Solution possibleSol = makePath(current);
+            addSolution(possibleSol);
+            if (solutions.size() == 2){
+                return;
             }
+        } else {
             List<State> neighbors = maze.legalNeighbors(current);
             for (State n : neighbors) {
                 if (!visited.contains(n)) {
                     parents.put(n, current);
-                    stack.push(n);
                     visited.add(n);
+                    dfsRecursive(n);
+                    visited.remove(n);
+                    parents.remove(n);
                 }
             }
         }
-
-        return solutions;
     }
 
     private Solution makePath(State goal) {

@@ -18,7 +18,7 @@ public class Solver {
 
         if (current.equals(maze.getGoal())) {
             solutions.add(new Solution(new ArrayList<>(pathStack)));
-            if(solutions.size()>100){
+            if(solutions.size()>10){
                 return;
             }
         } else {
@@ -29,7 +29,7 @@ public class Solver {
             }
         }
 
-        visited.remove(current);
+        //visited.remove(current);
         pathStack.pop();
     }
 }

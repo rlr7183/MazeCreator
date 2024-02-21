@@ -1,5 +1,5 @@
 public enum DifficultyLevel {
-    EASY("Easy Peasy", 15, 10, 80, 2),
+    EASY("Easy Peasy", 6, 10, 45, 2),
     MEDIUM("Mid", 15, 20, 150, 5),
     HARD("God Mode", 25, 30, 200, 10);
 

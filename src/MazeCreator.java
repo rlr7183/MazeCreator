@@ -2,7 +2,6 @@ import java.util.*;
 
 public class MazeCreator {
 
-    Solver solver;
 
     public static Maze initMaze(DifficultyLevel level){
         Random rand = new Random();
@@ -26,9 +25,9 @@ public class MazeCreator {
 
 
         //int blocks = rand.nextInt(size/5,size - 5);
-        int blocks = 1;
+        int blocks = 3;
         for (int i = 0; i < blocks; i++) {
-            int rowStart = rand.nextInt(0, size - 2);
+            int rowStart = rand.nextInt(0, size - 4 );
             int colStart = rand.nextInt(0, size - 1);
             //int blockHeight = rand.nextInt(2, size/3);
             //int blockWidth = rand.nextInt(2, size/3);
@@ -47,8 +46,6 @@ public class MazeCreator {
     }
 
     private static void adjustMaze(Maze maze) {
-
-
         List<Solution> newSolutions = Solver.dfs(maze);
         List<Solution> invalidSolutions = new ArrayList<>();
         List<Solution> validSolutions = new ArrayList<>();
@@ -60,12 +57,12 @@ public class MazeCreator {
                 invalidSolutions.add(s);
             }
         }
-        List<State> possibleWalls = findLeastOptimalStates(invalidSolutions);
+        List<State> possibleWalls = findLeastOptimalStates(invalidSolutions, validSolutions);
         int i = 0;
         Random rand = new Random();
         do {
             int row, col;
-            if(!possibleWalls.isEmpty()) {
+            if(i < possibleWalls.size()) {
                 row = possibleWalls.get(i).row;
                 col = possibleWalls.get(i).col;
             }
@@ -78,7 +75,7 @@ public class MazeCreator {
                 }
             }
             maze.getmaze()[row][col] = 'x';
-            System.out.println("x added ");
+            //System.out.println("x added ");
             newSolutions = Solver.dfs(maze);
             invalidSolutions.clear();
             validSolutions.clear();
@@ -92,10 +89,12 @@ public class MazeCreator {
             }
             if (validSolutions.isEmpty()){
                 maze.getmaze()[row][col] = '.';
+                
                 i++;
                 continue;
+
             }
-            possibleWalls = findLeastOptimalStates(invalidSolutions);
+            possibleWalls = findLeastOptimalStates(invalidSolutions, validSolutions);
             i = 0;
         }while(!(validSolutions.size() == 1 && invalidSolutions.isEmpty()));
 
@@ -103,9 +102,9 @@ public class MazeCreator {
     }
 
 
-    private static List<State> findLeastOptimalStates(List<Solution> solutions) {
+    private static List<State> findLeastOptimalStates(List<Solution> invalid, List<Solution> valid) {
         Map<State, Integer> stateFrequency = new HashMap<>();
-        for (Solution solution : solutions) {
+        for (Solution solution : invalid) {
             Set<State> uniqueStates = new HashSet<>(solution.getSol());
             for (State state : uniqueStates) {
                 stateFrequency.put(state, stateFrequency.getOrDefault(state, 0) + 1);
@@ -119,23 +118,34 @@ public class MazeCreator {
         pq.addAll(stateFrequency.entrySet());
 
         List<State> topStates = new ArrayList<>();
-        for (int i = 0; i < 5 && !pq.isEmpty(); i++) {
-            topStates.add(pq.poll().getKey());
+        while (topStates.size() < 10 && !pq.isEmpty()) {
+            State current = pq.poll().getKey();
+            boolean add = true;
+            for(State s: valid.get(0).getSol()){
+                if(s.row == current.row && s.col == current.col){
+                    add = false;
+                }
+
+            }
+            if(add){
+                topStates.add(current);
+            }
         }
+
 
         return topStates;
     }
 
 
     public static void main(String[] args) {
-        //char[][] mazeGrid = {{'.','.','.','.','.'}, {'.','.','.','.','.'}, {'.','.','.','.','.'}, {'.','.','.','.','.'}, {'x','.','x','.','x',}};
-        //Maze maze = new Maze(5, 5, mazeGrid, 1, 3);
+        char[][] mazeGrid = {{'.','.','.','.','.'}, {'.','.','.','.','.'}, {'.','.','.','.','.'}, {'.','.','.','.','.'}, {'.','.','.','.','.'}, {'x','.','x','.','x',}};
+        Maze maze = new Maze(6, 5, mazeGrid, 1, 3);
 
-        Maze maze = initMaze(DifficultyLevel.EASY);
+        //Maze maze = initMaze(DifficultyLevel.EASY);
 
         List<Solution> solutions = Solver.dfs(maze);
 
-        while(solutions.size() > 10 && Solver.containsValidSol(solutions)){
+        while(! Solver.containsValidSol(solutions)){
             maze = initMaze(DifficultyLevel.EASY);
             solutions = Solver.dfs(maze);
         }

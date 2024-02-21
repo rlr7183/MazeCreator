@@ -78,7 +78,7 @@ public class Solution {
     }
 
     public boolean meetReq(DifficultyLevel level){
-        if (!(level.getSolLen() - 30 < solLen && solLen < level.getSolLen() + 30)){
+        if (!(level.getSolLen() - 10 < solLen && solLen < level.getSolLen() + 10)){
             return false;
         }
         if (!(level.getNumTurns() - 5 < turns && turns < level.getNumTurns() + 5)){

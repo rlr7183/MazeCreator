@@ -23,7 +23,7 @@ public class Solver {
 
         }
 
-        if( containsValidSol(solutions) && solutions.size()>10){
+        if(  solutions.size()>1000 && containsValidSol(solutions)){
             return;
         }
 

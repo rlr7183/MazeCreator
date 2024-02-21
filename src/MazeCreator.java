@@ -89,7 +89,7 @@ public class MazeCreator {
             }
             if (validSolutions.isEmpty()){
                 maze.getmaze()[row][col] = '.';
-                
+
                 i++;
                 continue;
 
@@ -118,30 +118,35 @@ public class MazeCreator {
         pq.addAll(stateFrequency.entrySet());
 
         List<State> topStates = new ArrayList<>();
-        while (topStates.size() < 10 && !pq.isEmpty()) {
+        while (topStates.size() < 30 && !pq.isEmpty()) {
             State current = pq.poll().getKey();
-            boolean add = true;
-            for(State s: valid.get(0).getSol()){
-                if(s.row == current.row && s.col == current.col){
-                    add = false;
-                }
+            boolean add = false;
+            for (Solution sol : valid) {
+                boolean foundInSolution = false;
+                for (State s : sol.getSol()) {
+                    if (s.row == current.row && s.col == current.col) {
+                        foundInSolution = true;
 
+                    }
+                }
+                if (!foundInSolution) {
+                    add = true;
+                    break;
+                }
             }
-            if(add){
+            if (add) {
                 topStates.add(current);
             }
         }
-
-
         return topStates;
     }
 
 
     public static void main(String[] args) {
-        char[][] mazeGrid = {{'.','.','.','.','.'}, {'.','.','.','.','.'}, {'.','.','.','.','.'}, {'.','.','.','.','.'}, {'.','.','.','.','.'}, {'x','.','x','.','x',}};
-        Maze maze = new Maze(6, 5, mazeGrid, 1, 3);
+        //char[][] mazeGrid = {{'.','.','.','.','.'}, {'.','.','.','.','.'}, {'.','.','.','.','.'}, {'.','.','x','.','.'}, {'.','.','.','.','.'}, {'x','.','x','.','x',}};
+        //Maze maze = new Maze(6, 5, mazeGrid, 1, 3);
 
-        //Maze maze = initMaze(DifficultyLevel.EASY);
+        Maze maze = initMaze(DifficultyLevel.EASY);
 
         List<Solution> solutions = Solver.dfs(maze);
 

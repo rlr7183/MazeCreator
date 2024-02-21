@@ -1,12 +1,12 @@
 public enum DifficultyLevel {
-    EASY("Easy Peasy", 6, 10, 45, 2),
-    MEDIUM("Mid", 15, 20, 150, 5),
-    HARD("God Mode", 25, 30, 200, 10);
+    EASY("Easy Peasy", 8, 10, 40, 2),
+    MEDIUM("Mid", 12, 10, 55, 5),
+    HARD("God Mode", 25, 15, 90, 10);
 
     private final String name;
-    private final int size; // Example attribute (e.g., number of enemies)
-    private final int numTurns; // Another attribute (e.g., number of obstacles)
-    private final int solLen; // Another attribute (e.g., speed multiplier)
+    private final int size;
+    private final int numTurns;
+    private final int solLen;
     private final int DELen;
 
 

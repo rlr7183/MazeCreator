@@ -2,47 +2,59 @@ import java.util.*;
 
 public class Solver {
 
-    private Maze maze;
-    private Map<State, State> parents;
-    private Set<State> visited;
-    private Deque<State> stack;
-    private List<Solution> solutions;
 
-    public Solver(Maze maze) {
-        this.maze = maze;
-        this.parents = new HashMap<>();
-        this.visited = new HashSet<>();
-        this.stack = new ArrayDeque<>();
-        this.solutions = new ArrayList<>();
-    }
+    public static List<Solution> dfs(Maze maze) {
+        Map<State, State> parents = new HashMap<>();
+        Set<State> visited = new HashSet<>();
+        Deque<State> stack = new ArrayDeque<>();
+        List<Solution> solutions = new ArrayList<>();
+        State start = maze.getStart();
+        stack.push(start);
 
-    public List<Solution> dfs() {
-        dfsRecursive(maze.getStart());
+        dfsRecursive(stack, start, maze.getGoal(), visited, parents, solutions, maze);
+
         return solutions;
     }
 
-    private void dfsRecursive(State current) {
-        if (current.equals(maze.getGoal())) {
-            Solution possibleSol = makePath(current);
-            addSolution(possibleSol);
-            if (solutions.size() == 2){
-                return;
-            }
-        } else {
-            List<State> neighbors = maze.legalNeighbors(current);
-            for (State n : neighbors) {
-                if (!visited.contains(n)) {
-                    parents.put(n, current);
-                    visited.add(n);
-                    dfsRecursive(n);
-                    visited.remove(n);
-                    parents.remove(n);
-                }
+    private static void dfsRecursive(Deque<State> stack, State current, State goal, Set<State> visited, Map<State, State> parents, List<Solution> solutions, Maze maze) {
+        if (current.equals(goal)) {
+            //System.out.println("Solution found using DFS!");
+            solutions.add(makePath(current, parents));
+
+        }
+
+        if( containsValidSol(solutions) && solutions.size()>10){
+            return;
+        }
+
+        //System.out.printf("Current %d %d %d\n", current.row, current.col, current.dir);
+        visited.add(current);
+        List<State> neighbors = maze.legalNeighbors(current);
+        //System.out.println(neighbors.size());
+        for (State n : neighbors) {
+
+            //System.out.printf("N %d %d %d\n", n.row, n.col, n.dir);
+            if (!visited.contains(n)) {
+                parents.put(n, current);
+                stack.push(n);
+                dfsRecursive(stack, n, goal, visited, parents, solutions, maze);
+                stack.pop();
+                visited.remove(n);
+                parents.remove(n);
             }
         }
     }
 
-    private Solution makePath(State goal) {
+    public static boolean containsValidSol(List<Solution> solutions) {
+        for(Solution s: solutions){
+            if(s.meetReq(DifficultyLevel.EASY)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static Solution makePath(State goal, Map<State, State> parents) {
         List<State> path = new ArrayList<>();
         State state = goal;
         while (state != null) {
@@ -50,25 +62,6 @@ public class Solver {
             state = parents.get(state);
         }
         Collections.reverse(path);
-
         return new Solution(path);
     }
-
-    private void addSolution(Solution currentSolution) {
-        for (Solution s : solutions) {
-            if (s.equals(currentSolution)) {
-                return;
-            }
-        }
-        if(!currentSolution.meetReq(DifficultyLevel.EASY)) {
-            return;
-        }
-        Set<State> setComp = new HashSet<>(currentSolution.getSol());
-        if (setComp.size() != currentSolution.getSolLen()) {
-            return;
-        }
-        solutions.add(currentSolution);
-    }
-
-
 }
